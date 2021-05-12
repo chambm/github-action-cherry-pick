@@ -1,4 +1,5 @@
-#!/bin/sh -l
+#!/bin/bash
+set -e -x
 
 git_setup() {
   cat <<- EOF > $HOME/.netrc
