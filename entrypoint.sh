@@ -1,4 +1,5 @@
-#!/bin/sh -l
+#!/bin/bash
+set -e
 
 git_setup() {
   cat <<- EOF > $HOME/.netrc
@@ -23,19 +24,28 @@ git_cmd() {
   fi
 }
 
-PR_BRANCH="auto-$GITHUB_SHA"
-MESSAGE=$(git log -1 --format="%s" $GITHUB_SHA)
+PR_BRANCH="auto-$INPUT_PR_BRANCH-$GITHUB_SHA"
+MESSAGE=$(git log -1 $GITHUB_SHA | grep "AUTO: " | wc -l)
 
-if [[ $MESSAGE =~ "AUTO" ]]; then
+if [[ $MESSAGE -gt 0 ]]; then
   echo "Autocommit, NO ACTION"
   exit 0
 fi
+
+if [ -n "$INPUT_OPT_IN_MESSAGE" ]; then
+  MESSAGE=$(git log -1 $GITHUB_SHA | grep -F "$INPUT_OPT_IN_MESSAGE" | wc -l)
+  if [[ $MESSAGE -lt 1 ]]; then
+    echo "Opt-in message not found, NO ACTION"
+    exit 0
+  fi
+fi  
+
+PR_TITLE=$(git log -1 --format="%s" $GITHUB_SHA)
 
 git_setup
 git_cmd git remote update
 git_cmd git fetch --all
 git_cmd git checkout -b "${PR_BRANCH}" origin/"${INPUT_PR_BRANCH}"
-git_cmd git push -u origin "${PR_BRANCH}"
 git_cmd git cherry-pick "${GITHUB_SHA}"
-git_cmd git push
-git_cmd hub pull-request -b "${INPUT_PR_BRANCH}" -h "${PR_BRANCH}" -l "autocreated" -a "${GITHUB_ACTOR}" -m "\"AUTO: ${MESSAGE}\""
+git_cmd git push -u origin "${PR_BRANCH}"
+git_cmd hub pull-request -b "${INPUT_PR_BRANCH}" -h "${PR_BRANCH}" -l "${INPUT_PR_LABELS}" -a "${GITHUB_ACTOR}" -m "\"AUTO: ${PR_TITLE}\""

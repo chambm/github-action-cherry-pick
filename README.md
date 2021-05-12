@@ -15,10 +15,11 @@ developers works on but we want to push the changes to the Release branches too.
 * Create a new pr branch Z on the branch Y
 * Cherry Pick the commits from X into Z
 * Push the branch and create the PR on base Y 
-* PR title will be prefixed with `AUTO`
+* PR title will be prefixed with `AUTO: `
 
 #### Conditions:
-* If base branch commit contains `AUTO`, it wont recreate the PR.
+* If base branch commit contains `AUTO: `, it won't recreate the PR.
+* If opt-in message is set and commit does not contain the opt-in message, it won't create the PR.
 
 ## Inputs
 
