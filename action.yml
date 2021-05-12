@@ -12,6 +12,10 @@ inputs:
   opt_in_message:
     description: 'If set, PRs will only be triggered if this message is found in the last commit.'
     required: false
+  merge_strategy:
+    description: 'Options to pass to git cherry-pick to adjust the merging strategy.'
+    required: false
+    default: '--strategy=recursive'
 runs:
   using: 'docker'
   image: 'Dockerfile'
