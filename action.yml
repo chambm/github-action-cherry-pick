@@ -9,6 +9,9 @@ inputs:
     description: 'Labels for the new PR'
     required: false
     default: 'autocreated'
+  opt_in_message:
+    description: 'If set, PRs will only be triggered if this message is found in the last commit.'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
